@@ -25,9 +25,17 @@ galaxy_info:
       versions:
         - trusty
         - xenial
+    - name: Fedora
+      versions:
+        - 25
+    - name: EL
+      versions:
+        - 7
+
   galaxy_tags:
     - java
     - ubuntu
+    - centos
   dependencies:
   - role: Voronenko.developer_recipe
   #platforms:
