@@ -75,12 +75,18 @@
         shell: /tmp/get_java.py --version {{java_version}} --extension tar.gz
         register: java_download_url
 
+      - set_fact:
+          java_download_file: "{{java_download_url.rsplit('/', 1)[-1]}}"
+
+      - debug: msg="{{java_download_file}}"    
+
       - name: Java | download Java tar.gz
         get_url:
           headers='Cookie:gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie'
           dest="/tmp/java.tar.gz"
           url="{{java_download_url.stdout}}"
           validate_certs="true"
+          checksum="{{known_hashes[java_download_file]}}"
         become: yes
         tags:
             -java
