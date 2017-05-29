@@ -80,7 +80,7 @@
       - set_fact:
           java_download_file: "{{java_download_url.stdout.rsplit('/', 1)[-1]}}"
 
-      - debug: msg="{{java_download_file}}"    
+      - debug: msg="{{java_download_file}}"
 
       - name: Java | download Java tar.gz
         get_url:
@@ -155,4 +155,4 @@
         tags:
             -java
 
-    when: ansible_os_family == "Debian" and java_debian_install_method == "installer"
+    when: ansible_os_family == "Debian" and java_debian_install_method == "source"
