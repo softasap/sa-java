@@ -70,7 +70,6 @@ def discover_latest_java(java_version=8, package='server-jre', extension='tar.gz
         print('Visit \"' + url_2 + '\" to see available architectures and extensions')
         return None
 
-    # Add cookie to request and download the file to current directory
     if int(java_version) >= 8:
       download_url = match.group(0)
     else:
@@ -80,11 +79,10 @@ def discover_latest_java(java_version=8, package='server-jre', extension='tar.gz
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--extension', default="tar.gz")  # can 'store_false' for no-xxx flags
+    parser.add_argument('-e', '--extension', default="tar.gz")
     parser.add_argument('-p', '--package', default="jdk")
     parser.add_argument('-v', '--version', default='7')
     parser.add_argument('-a', '--architecture', default='linux-x64')
-    parser.add_argument('arg', nargs='*') # use '+' for 1 or more args (instead of 0 or more)
     parsed = parser.parse_args()
 
     result=discover_latest_java(java_version=parsed.version, package=parsed.package, extension=parsed.extension, architecture=parsed.architecture)
