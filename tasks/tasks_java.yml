@@ -12,7 +12,7 @@
 
       - debug: msg="If you are ok with it, set option_accept_non_oracle_mirror = true"
 
-      - debug: "As an additional precaution hash will be validated"
+      - debug: msg="As an additional precaution hash will be validated"
 
       - set_fact:
           java_debian_install_method: source
@@ -75,9 +75,6 @@
         shell: /tmp/get_java.py --version {{java_version}} --extension tar.gz
         register: java_download_url
 
-      set_fact:
-        jdk_version: "jdk-7u80"
-
       - name: Java | download Java tar.gz
         get_url:
           headers='Cookie:gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie'
@@ -94,8 +91,18 @@
         tags:
             -java
 
+      - name: Java | Detect jdk_folder
+        shell: find * -maxdepth 0 -type d | grep jdk1.{{java_version}}
+        become: yes
+        register: jdk_folder_raw
+        tags:
+            -java
+
+      - set_fact:
+          jdk_folder: "{{jdk_folder_raw.stdout}}"
+
       - name: Java | Fix ownership
-        file: state=directory path={{download_folder}}/jdk-7u80 owner=root group=root recurse=yes
+        file: state=directory path={{download_folder}}/{{jdk_folder}} owner=root group=root recurse=yes
         become: yes
         tags:
             -java
@@ -107,13 +114,13 @@
             -java
 
       - name: Java | Move Java to final folder
-        command: "mv /tmp/jdk-{{java_version}}* {{java_folder}}"
+        command: "mv /tmp/{{jdk_folder}} {{java_folder}}"
         become: yes
         tags:
             -java
 
       - name: Java | Create symlink for easier update
-        file: state=link src="{{java_folder}}/{{jdk_version}}" dest="{{java_folder}}/{{java_alias}}"
+        file: state=link src="{{java_folder}}/{{jdk_folder}}" dest="{{java_folder}}/{{java_alias}}"
         become: yes
         tags:
             -java
