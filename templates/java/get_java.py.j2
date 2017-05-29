@@ -53,7 +53,7 @@ def discover_latest_java(java_version=8, package='server-jre', extension='tar.gz
     if match is None:
         download_locations = java_download_locations
     else:
-        download_locations = java_download_locations
+        download_locations = [match.group(0)]
 
 
     match = None
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--extension', default="tar.gz")
     parser.add_argument('-p', '--package', default="jdk")
-    parser.add_argument('-v', '--version', default='7')
+    parser.add_argument('-v', '--version', default='8')
     parser.add_argument('-a', '--architecture', default='linux-x64')
     parsed = parser.parse_args()
 
