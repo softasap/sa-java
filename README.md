@@ -12,7 +12,7 @@ Important update for oracle 7 on ubuntu, May 2017:
 Oracle no longer provides public downloads, thus `oracle-java7-installer` no longer able to download distrubution.
 As a workaround, role will install oracle java 7 from _source_ using some trusted by you mirror with files.
 
-Please make sure, you trast mirror configured as `alternative_java_6_7_mirror`, also advise is to use your own mirror.
+Please make sure, you trust mirror configured as `alternative_java_6_7_mirror`, also advise is to use your own mirror.
 
 to make sure, you understand your responsibility, you need specifically set `true` to `option_accept_non_oracle_mirror`
 
