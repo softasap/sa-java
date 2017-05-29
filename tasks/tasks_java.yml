@@ -89,9 +89,23 @@
           url="{{java_download_url.stdout}}"
           validate_certs="true"
           checksum="{{known_hashes[java_download_file]}}"
+        when: option_validate_checksum
         become: yes
         tags:
             -java
+
+      - name: Java | download Java tar.gz
+        get_url:
+          headers='Cookie:gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie'
+          dest="/tmp/java.tar.gz"
+          url="{{java_download_url.stdout}}"
+          validate_certs="true"
+          checksum="{{known_hashes[java_download_file]}}"
+        when: not option_validate_checksum
+        become: yes
+        tags:
+            -java
+
 
       - name: Java | Extract Java archive
         command: "tar -xzf /tmp/java.tar.gz -C /tmp"

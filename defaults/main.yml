@@ -4,8 +4,10 @@
 
   role_dir: "{{role_path}}"
 
+  option_validate_checksum: false
+  option_accept_non_oracle_mirror: false
+
   alternative_java_6_7_mirror: "ftp://ftp.slackware.com/.1/funtoo/distfiles/oracle-java/"
-  option_accept_non_oracle_download_mirror: false
 
   java_debian_install_method: installer
 
