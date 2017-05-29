@@ -27,6 +27,7 @@
 
     - name: execute java discovery script
       shell: /tmp/get_java.py --version {{java_version}} --extension rpm
+      failed_when: "'is not available' in java_download_url.stdout"
       register: java_download_url
 
     - name: download Java RPM
@@ -73,10 +74,11 @@
 
       - name: Java | execute java discovery script
         shell: /tmp/get_java.py --version {{java_version}} --extension tar.gz
+        failed_when: "'is not available' in java_download_url.stdout"
         register: java_download_url
 
       - set_fact:
-          java_download_file: "{{java_download_url.rsplit('/', 1)[-1]}}"
+          java_download_file: "{{java_download_url.stdout.rsplit('/', 1)[-1]}}"
 
       - debug: msg="{{java_download_file}}"    
 
