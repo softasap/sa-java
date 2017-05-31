@@ -159,8 +159,9 @@
         tags:
             -java
 
-      - name: Java | Create symlink for easier update
-        file: state=link src="{{java_folder}}/{{jdk_folder}}" dest="{{java_folder}}/{{java_alias}}"
+      - name: Java | Create symlink for easier update ln -s {{java_folder}}/{{jdk_folder}} {{java_folder}}/{{java_alias}}
+        file: state=link src="{{java_folder}}/{{jdk_folder}}/" dest="{{java_folder}}/{{java_alias}}"
+        # shell: ln -s {{java_folder}}/{{jdk_folder}}/ {{java_folder}}/{{java_alias}}
         become: yes
         tags:
             -java
