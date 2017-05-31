@@ -17,11 +17,13 @@
       - set_fact:
           java_debian_install_method: source
 
-    when:  java_present | failed and java_version in ["6", "7"] and not option_accept_non_oracle_mirror | default(True)
+    when:  (java_present | failed) and (java_version in ["6", "7", 6, 7])
 
   - name: template java discovery script
     template: src="{{role_dir}}/templates/java/get_java.py.j2" dest="/tmp/get_java.py" mode="u=rwx,g=rx,o=rx"
     when:  java_present | failed
+
+  - debug: msg="installing using {{java_debian_install_method}} on {{ansible_os_family}}"
 
   - block:
 
@@ -45,6 +47,8 @@
       become: yes
 
     when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS' or ansible_distribution == 'Fedora') and java_present | failed
+
+  - debug: msg="installer block"
 
   - block:
 
@@ -72,7 +76,9 @@
 
     when: ansible_os_family == "Debian" and java_debian_install_method == "installer"
 
-    block:
+  - debug: msg="tar.gz block"
+
+  - block: 
 
       - name: Java | execute java discovery script
         shell: /tmp/get_java.py --version {{java_version}} --extension tar.gz
@@ -86,7 +92,7 @@
 
       - debug: msg="{{java_download_file}}"
 
-      - name: Java | download Java tar.gz
+      - name: Java | download Java tar.gz (with checksum validation)
         get_url:
           headers='Cookie:gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie'
           dest="/tmp/java.tar.gz"
@@ -98,7 +104,7 @@
         tags:
             -java
 
-      - name: Java | download Java tar.gz
+      - name: Java | download Java tar.gz (without checksum validation)
         get_url:
           headers='Cookie:gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie'
           dest="/tmp/java.tar.gz"
@@ -141,6 +147,12 @@
         tags:
             -java
 
+      - name: Java | Ensure destination folder is clean
+        file: path="{{java_folder}}/{{jdk_folder}}" state="absent"
+        become: yes
+        tags:
+            -java
+
       - name: Java | Move Java to final folder
         command: "mv /tmp/{{jdk_folder}} {{java_folder}}"
         become: yes
@@ -153,8 +165,20 @@
         tags:
             -java
 
-      - name: Make Java available for system
+      - name: Java | Make Java available for system
         command: 'update-alternatives --install "/usr/bin/java" "java" "{{java_folder}}/{{java_alias}}/bin/java" 1'
+        become: yes
+        tags:
+            -java
+
+      - name: Java | Set JAVA_HOME
+        lineinfile: dest=/etc/environment state=present regexp="^JAVA_HOME=*" line="JAVA_HOME={{java_folder}}/{{java_alias}}/"
+        become: yes
+        tags:
+            -java
+
+      - name: Java | add {{java_folder}}/{{java_alias}}/bin to path
+        lineinfile: dest=/etc/environment state=present backrefs=yes regexp='PATH=(["]*)((?!.*?{{java_folder}}/{{java_alias}}/bin).*?)(["]*)$' line="PATH=\1\2:{{java_folder}}/{{java_alias}}/bin\3"
         become: yes
         tags:
             -java
