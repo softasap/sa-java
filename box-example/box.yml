@@ -23,7 +23,7 @@
   roles:
      - {
          role: "sa-java",
-         java_version: 7
+         java_version: 8
        }
 
 

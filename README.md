@@ -45,6 +45,34 @@ Usage example:
 
 ```
 
+Notes
+-----
+
+List available java installations
+
+`sudo  update-java-alternatives --list`
+
+Switch default java
+
+`sudo  update-java-alternatives --set [JDK/JRE name e.g. java-8-oracle]`
+
+Magic oneliners to export JAVA_HOME
+
+JRE: 
+`export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")`
+
+JDK:
+
+`export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:jre/bin/java::")`
+
+
+If you want to use different JDKs/JREs for each Java task, you can run update-alternatives to configure one java executable at a time; you can run
+
+`sudo  update-alternatives --config java[Tab]`
+to see the Java commands that can be configured (java, javac, javah, javaws, etc). And then
+
+`sudo  update-alternatives --config [javac|java|javadoc|etc.]`
+
 Usage with ansible galaxy workflow
 ----------------------------------
 
