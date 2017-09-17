@@ -186,12 +186,12 @@
 
     when: ansible_os_family == "Debian" and java_debian_install_method == "source"
 
-      - name: Java | Container aware, cleanup temporary artifacts
-        file: path="/tmp/{{item}}" state="absent"
-        with_items:
-          - get_java.py
-          - java.rpm
-          - java.tar.gz
-        tags:
-            -java
+  - name: Java | Container aware, cleanup temporary artifacts
+    file: path="/tmp/{{item}}" state="absent"
+    with_items:
+      - get_java.py
+      - java.rpm
+      - java.tar.gz
+    tags:
+      -java
 
