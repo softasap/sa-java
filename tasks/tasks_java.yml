@@ -40,11 +40,11 @@
         dest="/tmp/java.rpm"
         url="{{java_download_url.stdout}}"
         validate_certs="true"
-      become: yes
+      become: "{{ 'no' if role_no_become is defined else 'yes' }}"
 
     - name: install RPM
       package: name=/tmp/java.rpm state=present
-      become: yes
+      become: "{{ 'no' if role_no_become is defined else 'yes' }}"
 
     when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS' or ansible_distribution == 'Fedora') and java_present | failed
 
@@ -55,14 +55,14 @@
     - name: Java | Add apt repository
       apt_repository: repo='ppa:webupd8team/java'
       when: java_present|failed
-      become: yes
+      become: "{{ 'no' if role_no_become is defined else 'yes' }}"
       tags:
           -java
 
     - name: Java | Accept the Oracle license before the installation
       shell: echo oracle-java{{java_version}}-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
       when: java_present|failed
-      become: yes
+      become: "{{ 'no' if role_no_become is defined else 'yes' }}"
       tags:
           -java
 
@@ -70,7 +70,7 @@
     - name: Java | Install
       apt: update-cache=yes force=yes state=present pkg=oracle-java{{java_version}}-installer
       when: java_present|failed
-      become: yes
+      become: "{{ 'no' if role_no_become is defined else 'yes' }}"
       tags:
           -java
 
@@ -100,7 +100,7 @@
           validate_certs="true"
           checksum="{{known_hashes[java_download_file]}}"
         when: option_validate_checksum
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
@@ -112,14 +112,14 @@
           validate_certs="true"
           checksum="{{known_hashes[java_download_file]}}"
         when: not option_validate_checksum
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
 
       - name: Java | Extract Java archive
         command: "tar -xzf /tmp/java.tar.gz -C /tmp"
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
@@ -127,7 +127,7 @@
         shell: find * -maxdepth 0 -type d | grep jdk1.{{java_version}}
         args:
           chdir: /tmp
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         register: jdk_folder_raw
         tags:
             -java
@@ -137,51 +137,61 @@
 
       - name: Java | Fix ownership
         file: state=directory path=/tmp/{{jdk_folder}} owner=root group=root recurse=yes
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
       - name: Java | Create Java folder
         file: "state=directory path={{java_folder}}"
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
       - name: Java | Ensure destination folder is clean
         file: path="{{java_folder}}/{{jdk_folder}}" state="absent"
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
       - name: Java | Move Java to final folder
         command: "mv /tmp/{{jdk_folder}} {{java_folder}}"
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
       - name: Java | Create symlink for easier update ln -s {{java_folder}}/{{jdk_folder}} {{java_folder}}/{{java_alias}}
         file: state=link src="{{java_folder}}/{{jdk_folder}}/" dest="{{java_folder}}/{{java_alias}}"
         # shell: ln -s {{java_folder}}/{{jdk_folder}}/ {{java_folder}}/{{java_alias}}
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
       - name: Java | Make Java available for system
         command: 'update-alternatives --install "/usr/bin/java" "java" "{{java_folder}}/{{java_alias}}/bin/java" 1'
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
       - name: Java | Set JAVA_HOME
         lineinfile: dest=/etc/environment state=present regexp="^JAVA_HOME=*" line="JAVA_HOME={{java_folder}}/{{java_alias}}/"
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
       - name: Java | add {{java_folder}}/{{java_alias}}/bin to path
         lineinfile: dest=/etc/environment state=present backrefs=yes regexp='PATH=(["]*)((?!.*?{{java_folder}}/{{java_alias}}/bin).*?)(["]*)$' line="PATH=\1\2:{{java_folder}}/{{java_alias}}/bin\3"
-        become: yes
+        become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
     when: ansible_os_family == "Debian" and java_debian_install_method == "source"
+
+      - name: Java | Container aware, cleanup temporary artifacts
+        file: path="/tmp/{{item}}" state="absent"
+        with_items:
+          - get_java.py
+          - java.rpm
+          - java.tar.gz
+        tags:
+            -java
+
