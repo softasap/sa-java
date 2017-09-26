@@ -188,6 +188,7 @@
 
   - name: Java | Container aware, cleanup temporary artifacts
     file: path="/tmp/{{item}}" state="absent"
+    become: "{{ 'no' if role_no_become is defined else 'yes' }}"
     with_items:
       - get_java.py
       - java.rpm
