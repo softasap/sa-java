@@ -74,7 +74,7 @@
       tags:
           -java
 
-    when: ansible_os_family == "Debian" and java_debian_install_method == "installer"
+    when: ansible_os_family == "Debian" and java_debian_install_method == "installer" and (java_present | failed)
 
   - debug: msg="tar.gz block"
 
@@ -203,7 +203,7 @@
         tags:
             -java
 
-    when: ansible_os_family == "Debian" and java_debian_install_method == "source"
+    when: ansible_os_family == "Debian" and java_debian_install_method == "source" and (java_present | failed)
 
   - name: Java | Container aware, cleanup temporary artifacts
     file: path="/tmp/{{item}}" state="absent"
