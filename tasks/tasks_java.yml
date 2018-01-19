@@ -1,3 +1,4 @@
+---
   - name: Java | Check if is present
     command: test -x /usr/bin/java
     ignore_errors: yes
@@ -5,23 +6,41 @@
     tags:
         -java
 
+  - set_fact:
+      java_alias: "java-{{java_version}}-oracle"
+    when: java_alias is not defined
+
+  - set_fact:
+      java_folder: "/usr/lib/jvm"
+    when: java_folder is not defined
+
+
   - block:
       - debug: msg="Warning, you requested historic java installation not available from oracle download location"
 
-      - debug: msg="Role will use alternative mirror {{alternative_java_6_7_mirror}}"
+      - debug: msg="Role will use alternative mirror {{alternative_java_6_7_mirror | default ('SPECIFY') }}"
 
       - debug: msg="If you are ok with it, set option_accept_non_oracle_mirror = true"
 
       - debug: msg="As an additional precaution hash will be validated"
 
-      - set_fact:
+      - name: due to java_version in 6-7, set java_debian_install_method to source
+        set_fact:
           java_debian_install_method: source
 
     when:  (java_present | failed) and (java_version in ["6", "7", 6, 7])
 
+  - block:
+
+      - name: By default setting java_debian_install_method to installer
+        set_fact:
+          java_debian_install_method: installer
+
+    when:  (java_present | failed) and (java_debian_install_method is not defined) and not (java_version in ["6", "7", 6, 7])
+
+
   - name: template java discovery script
     template: src="{{role_dir}}/templates/java/get_java.py.j2" dest="/tmp/get_java.py" mode="u=rwx,g=rx,o=rx"
-    when:  java_present | failed
 
   - debug: msg="installing using {{java_debian_install_method}} on {{ansible_os_family}}"
 
@@ -74,7 +93,7 @@
       tags:
           -java
 
-    when: ansible_os_family == "Debian" and java_debian_install_method == "installer" and (java_present | failed)
+    when: ansible_os_family == "Debian" and java_debian_install_method == "installer"
 
   - debug: msg="tar.gz block"
 
@@ -119,7 +138,7 @@
           url="{{java_download_url.stdout}}"
           validate_certs="true"
           checksum="{{known_hashes[java_download_file]}}"
-        when: option_validate_checksum
+        when: option_validate_checksum | default(False)
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
@@ -130,7 +149,7 @@
           dest="/tmp/java.tar.gz"
           url="{{java_download_url.stdout}}"
           validate_certs="true"
-        when: not option_validate_checksum
+        when: not option_validate_checksum | default(False)
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
@@ -178,9 +197,9 @@
         tags:
             -java
 
-      - name: Java | Create symlink for easier update ln -s {{java_folder}}/{{jdk_folder}} {{java_folder}}/{{java_alias}}
-        #file: state=link src="{{java_folder}}/{{jdk_folder}}/" dest="{{java_folder}}/{{java_alias}}"
-        shell: ln -s {{java_folder}}/{{jdk_folder}}/ {{java_folder}}/{{java_alias}}
+      - name: "Java | Create symlink for easier update ln -s {{java_folder}}/{{jdk_folder}} {{java_folder}}/{{java_alias }}"
+        #file: state=link src="{{java_folder}}/{{jdk_folder}}/" dest="{{java_folder}}/{{java_alias }}"
+        shell: ln -s {{java_folder}}/{{jdk_folder}}/ {{java_folder}}/{{java_alias }}
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
@@ -192,18 +211,18 @@
             -java
 
       - name: Java | Set JAVA_HOME
-        lineinfile: dest=/etc/environment state=present regexp="^JAVA_HOME=*" line="JAVA_HOME={{java_folder}}/{{java_alias}}/"
+        lineinfile: dest=/etc/environment state=present regexp="^JAVA_HOME=*" line="JAVA_HOME={{java_folder}}/{{java_alias }}/"
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
-      - name: Java | add {{java_folder}}/{{java_alias}}/bin to path
-        lineinfile: dest=/etc/environment state=present backrefs=yes regexp='PATH=(["]*)((?!.*?{{java_folder}}/{{java_alias}}/bin).*?)(["]*)$' line="PATH=\1\2:{{java_folder}}/{{java_alias}}/bin\3"
+      - name: Java | add {{java_folder}}/{{java_alias }}/bin to path
+        lineinfile: dest=/etc/environment state=present backrefs=yes regexp='PATH=(["]*)((?!.*?{{java_folder}}/{{java_alias }}/bin).*?)(["]*)$' line="PATH=\1\2:{{java_folder}}/{{java_alias }}/bin\3"
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
-    when: ansible_os_family == "Debian" and java_debian_install_method == "source" and (java_present | failed)
+    when: ansible_os_family == "Debian" and java_debian_install_method == "source"
 
   - name: Java | Container aware, cleanup temporary artifacts
     file: path="/tmp/{{item}}" state="absent"
@@ -214,4 +233,3 @@
       - java.tar.gz
     tags:
       -java
-
