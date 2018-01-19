@@ -9,7 +9,7 @@
 
   alternative_java_6_7_mirror: "ftp://ftp.slackware.com/.1/funtoo/distfiles/oracle-java/"
 
-  java_debian_install_method: installer
+  java_debian_install_method: installer # source
 
   java_download_folder: /usr/src
   java_folder: /usr/lib/jvm
