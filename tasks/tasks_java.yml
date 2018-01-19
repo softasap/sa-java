@@ -78,25 +78,39 @@
 
   - debug: msg="tar.gz block"
 
-  - block: 
+  - block:
 
-      - name: Java | execute java discovery script
-        shell: /tmp/get_java.py --version {{java_version}} --extension tar.gz
-        failed_when: "'is not available' in java_download_url.stdout"
+      - block:
+
+              - name: Java | execute java discovery script
+                shell: /tmp/get_java.py --version {{java_version}} --extension tar.gz
+                failed_when: "'is not available' in java_download_url.stdout"
+                register: java_download_url
+
+              - set_fact:
+                  java_download_file: "{{java_download_url.stdout.rsplit('/', 1)[-1]}}"
+                  detected_download_url: "{{java_download_url.stdout}}"
+
         when: custom_java_download_url is not defined
-        register: java_download_url
 
-      - name: Java | confirm custom download location
-        shell: "echo {{custom_java_download_url}}"  
+      - block:
+
+              - name: Java | confirm custom download location
+                shell: "echo {{custom_java_download_url}}"
+                when: custom_java_download_url is defined
+                register: java_download_url_custom
+
+
+              - set_fact:
+                  detected_download_url: "{{custom_java_download_url}}"
+                  java_download_file: "{{java_download_url_custom.stdout.rsplit('/', 1)[-1]}}"
+
+
         when: custom_java_download_url is defined
+
+      - name: Java | summary of choice for download location
+        shell: "echo {{detected_download_url}}"
         register: java_download_url
-
-      - debug: msg="{{java_download_url.stdout}}"          
-
-      - set_fact:
-          java_download_file: "{{java_download_url.stdout.rsplit('/', 1)[-1]}}"
-
-      - debug: msg="{{java_download_file}}"
 
       - name: Java | download Java tar.gz (with checksum validation)
         get_url:
@@ -116,7 +130,6 @@
           dest="/tmp/java.tar.gz"
           url="{{java_download_url.stdout}}"
           validate_certs="true"
-          checksum="{{known_hashes[java_download_file]}}"
         when: not option_validate_checksum
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
@@ -166,8 +179,8 @@
             -java
 
       - name: Java | Create symlink for easier update ln -s {{java_folder}}/{{jdk_folder}} {{java_folder}}/{{java_alias}}
-        file: state=link src="{{java_folder}}/{{jdk_folder}}/" dest="{{java_folder}}/{{java_alias}}"
-        # shell: ln -s {{java_folder}}/{{jdk_folder}}/ {{java_folder}}/{{java_alias}}
+        #file: state=link src="{{java_folder}}/{{jdk_folder}}/" dest="{{java_folder}}/{{java_alias}}"
+        shell: ln -s {{java_folder}}/{{jdk_folder}}/ {{java_folder}}/{{java_alias}}
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
