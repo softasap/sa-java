@@ -49,5 +49,5 @@ $ConfigData = @{
     )
 }
 
-JAVA_DSC
+JAVA_DSC -ConfigurationData $ConfigData
 Start-DscConfiguration -Path .\JAVA_DSC -Wait -Verbose -Force

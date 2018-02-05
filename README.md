@@ -3,6 +3,7 @@ sa-java
 
 [![Build Status](https://travis-ci.org/softasap/sa-java.svg?branch=master)](https://travis-ci.org/softasap/sa-java)
 
+[![Includes support for Windows with PS5](https://img.shields.io/badge/Windows-Friendly-blue.svg)](https://img.shields.io/badge/Windows-Friendly-blue.svg)
 
 Installs oracle java 7-8 controlled by java_version variable
 
@@ -58,7 +59,7 @@ Switch default java
 
 Magic oneliners to export JAVA_HOME
 
-JRE: 
+JRE:
 `export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")`
 
 JDK:
