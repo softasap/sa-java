@@ -7,7 +7,8 @@ sa-java
 
 Installs oracle java 7-8 controlled by java_version variable
 
-java 8 is installed using rpm or oracle-java8-installer on debian.
+java is installed using rpm or oracle-java8-installer on debian or by downloading tar.gz distribution.
+On Windows systems, java is installed with PowerShell 5 and help of Chocolate provisioner.
 
 Important update for oracle 7 on ubuntu, May 2017:
 Oracle no longer provides public downloads, thus `oracle-java7-installer` no longer able to download distrubution.
@@ -43,6 +44,40 @@ Usage example:
          role: "sa-java",
          java_version: 7
        }
+
+```
+
+# Windows support
+
+For windows support we expect, that box is prepared for provisioning with ansible (best used with role  https://github.com/softasap/sa-box-bootstrap-win ,
+but if you configured the same setup manually will work too )
+
+For windows systems there is only one parameter supported:  `java_version`
+
+Example of the typical windows play:
+
+```YAML
+
+vars:
+  - root_dir: ..
+
+  - ansible_connection: winrm
+  - ansible_ssh_port: 5986
+  - ansible_winrm_server_cert_validation: ignore
+  - ansible_winrm_transport: ssl
+
+
+pre_tasks:
+  - debug: msg="Pre tasks section"
+
+  - name: gather facts
+    setup:
+
+roles:
+   - {
+       role: "sa-java",
+       java_version: 8
+     }
 
 ```
 
