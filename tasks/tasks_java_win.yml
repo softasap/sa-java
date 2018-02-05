@@ -1,0 +1,10 @@
+---
+
+  - name: Java | Install package
+    win_dsc:
+      resource_name: cChocoPackageInstaller
+      Name: "jdk{{java_version}}"
+      DependsOn: "[cChocoInstaller]installChoco"
+
+  - name: Java | Add java to path
+    script: files/windows/java_dsc.ps1
