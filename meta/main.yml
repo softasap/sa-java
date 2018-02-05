@@ -31,13 +31,15 @@ galaxy_info:
     - name: EL
       versions:
         - 7
+    - name: Windows
+      versions:
+        - All
 
   galaxy_tags:
     - java
     - ubuntu
     - centos
-  dependencies:
-  - role: Voronenko.developer_recipe
+    - Windows
   #platforms:
   #- name: EL
   #  versions:
