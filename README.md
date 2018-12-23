@@ -29,7 +29,7 @@ alternative_java_6_7_mirror: "ftp://ftp.slackware.com/.1/funtoo/distfiles/oracle
 #settings for installation from sources
 java_download_folder: /usr/src
 java_folder: /usr/lib/jvm
-java_alias: "java-{{java_version}}-oracle"
+java_alias: "java-{{ java_version }}-oracle"
 
 known_hashes:
   "jdk-7u80-linux-x64.tar.gz": "sha256:bad9a731639655118740bee119139c1ed019737ec802a630dd7ad7aab4309623"

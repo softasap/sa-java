@@ -31,15 +31,15 @@ galaxy_info:
     - name: EL
       versions:
         - 7
-    - name: Windows
+    - name: windows
       versions:
-        - All
+        - all
 
   galaxy_tags:
     - java
     - ubuntu
     - centos
-    - Windows
+    - windows
   #platforms:
   #- name: EL
   #  versions:
