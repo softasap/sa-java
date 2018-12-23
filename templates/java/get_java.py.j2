@@ -42,13 +42,13 @@ def discover_latest_java(java_version=8, package='server-jre', extension='tar.gz
             print('\t' + valid_package)
         return None
 
-    url = "http://www.oracle.com"
+    url = "https://www.oracle.com"
 
     url_1 = url + "/technetwork/java/javase/downloads/index.html"
     pattern_1 = '\/technetwork\/java/\javase\/downloads\/' + package + str(java_version) + '-downloads-.+?\.html'
     match = regex_websearch(url_1, pattern_1)
 
-    search_pattern = "http\:\/\/download.oracle\.com\/otn(-pub)?\/java\/jdk\/[" + java_version + "]u[0-9]+?-.+?\/(" + package + "-[" + java_version + "]u[0-9]+?-" + architecture + "." + extension + ")"
+    search_pattern = "https\:\/\/download.oracle\.com\/otn(-pub)?\/java\/jdk\/[" + java_version + "]u[0-9]+?-.+?\/(" + package + "-[" + java_version + "]u[0-9]+?-" + architecture + "." + extension + ")"
 
     if match is None:
         download_locations = java_download_locations
@@ -90,3 +90,4 @@ if __name__ == '__main__':
       sys.exit(1)
     print result
     sys.exit(0)
+

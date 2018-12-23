@@ -2,7 +2,6 @@ sa-java
 =========
 
 [![Build Status](https://travis-ci.org/softasap/sa-java.svg?branch=master)](https://travis-ci.org/softasap/sa-java)
-
 [![Includes support for Windows with PS5](https://img.shields.io/badge/Windows-Friendly-blue.svg)](https://img.shields.io/badge/Windows-Friendly-blue.svg)
 
 Installs oracle java 7-8 controlled by java_version variable
@@ -30,7 +29,7 @@ alternative_java_6_7_mirror: "ftp://ftp.slackware.com/.1/funtoo/distfiles/oracle
 #settings for installation from sources
 java_download_folder: /usr/src
 java_folder: /usr/lib/jvm
-java_alias: "java-{{java_version}}-oracle"
+java_alias: "java-{{ java_version }}-oracle"
 
 known_hashes:
   "jdk-7u80-linux-x64.tar.gz": "sha256:bad9a731639655118740bee119139c1ed019737ec802a630dd7ad7aab4309623"
@@ -136,6 +135,14 @@ Please adjust the path accordingly.
 Copyright and license
 ---------------------
 
-Code licensed under the [BSD 3 clause] (https://opensource.org/licenses/BSD-3-Clause) or the [MIT License] (http://opensource.org/licenses/MIT).
+Code is dual licensed under the [BSD 3 clause] (https://opensource.org/licenses/BSD-3-Clause) and the [MIT License] (http://opensource.org/licenses/MIT). Choose the one that suits you best.
+
+Reach us:
 
 Subscribe for roles updates at [FB] (https://www.facebook.com/SoftAsap/)
+
+Join gitter discussion channel at [Gitter](https://gitter.im/softasap)
+
+Discover other roles at  http://www.softasap.com/roles/registry_generated.html
+
+visit our blog at http://www.softasap.com/blog/archive.html
