@@ -25,15 +25,16 @@ galaxy_info:
       versions:
         - trusty
         - xenial
+        - bionic
     - name: Fedora
       versions:
         - 25
     - name: EL
       versions:
         - 7
-    - name: windows
-      versions:
-        - all
+    # - name: windows
+    #   versions:
+    #     - all
 
   galaxy_tags:
     - java
