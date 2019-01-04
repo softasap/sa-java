@@ -38,7 +38,9 @@
         set_fact:
           java_debian_install_method: installer
 
-    when:  (java_present is failed) and (java_debian_install_method is not defined) and not (java_version in ["6", "7", 6, 7])
+    when: >
+       (java_debian_install_method is not defined)
+       and not (java_version in ["6", "7", 6, 7])
 
 
   - name: template java discovery script
@@ -67,7 +69,11 @@
       package: name=/tmp/java.rpm state=present
       become: "{{ 'no' if role_no_become is defined else 'yes' }}"
 
-    when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS' or ansible_distribution == 'Fedora') and java_present | failed
+    when: >
+        (ansible_distribution == 'RedHat'
+        or ansible_distribution == 'CentOS'
+        or ansible_distribution == 'Fedora')
+        and java_present is failed
 
   - debug: msg="installer block"
 
@@ -81,7 +87,9 @@
           -java
 
     - name: Java | Accept the Oracle license before the installation
-      shell: echo oracle-java{{ java_version }}-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+      shell: >
+          echo oracle-java{{ java_version }}-installer shared/accepted-oracle-license-v1-1 select true |
+          /usr/bin/debconf-set-selections
       when: java_present is failed
       become: "{{ 'no' if role_no_become is defined else 'yes' }}"
       tags:
@@ -92,7 +100,7 @@
       apt: update-cache=yes force=yes state=present pkg=oracle-java{{ java_version }}-installer
       retries: 3
       register: result
-      until: not result.failed
+      until: not result is failed
       when: java_present is failed
       become: "{{ 'no' if role_no_become is defined else 'yes' }}"
       tags:
@@ -206,8 +214,13 @@
         tags:
             -java
 
-      - name: "Java | Create symlink for easier update ln -s {{ java_folder }}/{{ jdk_folder }} {{ java_folder }}/{{ java_alias }}"
-        file: state=link src="{{ java_folder }}/{{ jdk_folder }}/" dest="{{ java_folder }}/{{ java_alias }}"
+      - name: >
+            Java | Create symlink for easier update
+            ln -s {{ java_folder }}/{{ jdk_folder }} {{ java_folder }}/{{ java_alias }}
+        file:
+          state: link
+          src: "{{ java_folder }}/{{ jdk_folder }}/"
+          dest: "{{ java_folder }}/{{ java_alias }}"
         # shell: ln -s {{ java_folder }}/{{ jdk_folder }}/ {{ java_folder }}/{{ java_alias }}
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
@@ -220,13 +233,22 @@
             -java
 
       - name: Java | Set JAVA_HOME
-        lineinfile: dest=/etc/environment state=present regexp="^JAVA_HOME=*" line="JAVA_HOME={{ java_folder }}/{{ java_alias }}/"
+        lineinfile:
+          dest: /etc/environment
+          state: present
+          regexp: "^JAVA_HOME=*"
+          line: "JAVA_HOME={{ java_folder }}/{{ java_alias }}/"
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
 
       - name: Java | add {{ java_folder }}/{{ java_alias }}/bin to path
-        lineinfile: dest=/etc/environment state=present backrefs=yes regexp='PATH=(["]*)((?!.*?{{ java_folder }}/{{ java_alias }}/bin).*?)(["]*)$' line="PATH=\1\2:{{ java_folder }}/{{ java_alias }}/bin\3"
+        lineinfile:
+          dest: /etc/environment
+          state: present
+          backrefs: yes
+          regexp: 'PATH=(["]*)((?!.*?{{ java_folder }}/{{ java_alias }}/bin).*?)(["]*)$'
+          line: PATH=\1\2:{{ java_folder }}/{{ java_alias }}/bin\3"
         become: "{{ 'no' if role_no_become is defined else 'yes' }}"
         tags:
             -java
