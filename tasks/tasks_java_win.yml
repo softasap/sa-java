@@ -3,7 +3,7 @@
   - name: Java | Install package
     win_dsc:
       resource_name: cChocoPackageInstaller
-      Name: "jdk{{ java_version }}"
+      Name: "jdk{{ java_version | default(8) }}"
       DependsOn: "[cChocoInstaller]installChoco"
 
   - name: Java | Add java to path
