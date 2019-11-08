@@ -3,6 +3,14 @@
 
     - block:
 
+        - name: Set 8 defaults
+          set_fact:
+            java_package: "java-1.8.0-openjdk"
+
+      when: ansible_distribution == 'Fedora'
+
+    - block:
+
         - name: Set 7 defaults
           set_fact:
             java_package: "java-1.7.0-openjdk"
